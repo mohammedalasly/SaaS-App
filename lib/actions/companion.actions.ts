@@ -27,6 +27,10 @@ export const getAllCompanions = async ({
 }: GetAllCompanions) => {
 	const supabase = createSupabaseClient()
 
+	// Normalize empty strings to undefined
+	subject = typeof subject === "string" ? subject.trim() : undefined
+	topic = typeof topic === "string" ? topic.trim() : undefined
+
 	let query = supabase.from("companions").select()
 
 	if (subject && topic) {
@@ -47,6 +51,7 @@ export const getAllCompanions = async ({
 
 	return companions
 }
+
 
 export const getCompanion = async (id: string) => {
 	const supabase = createSupabaseClient()
@@ -145,28 +150,36 @@ export const newCompanionPermissions = async () => {
 
 // Bookmarks
 export const addBookmark = async (companionId: string, path: string) => {
-	const { userId } = await auth()
-	if (!userId) return
-	const supabase = createSupabaseClient()
-	const { data, error } = await supabase.from("bookmarks").insert({
-		companion_id: companionId,
-		user_id: userId,
-	})
-	if (error) {
-		throw new Error(error.message)
-	}
-	// Revalidate the path to force a re-render of the page
+  const { userId } = await auth()
+  if (!userId) return
 
-	revalidatePath(path)
-	return data
+  const supabase = createSupabaseClient()
+
+  const { data, error } = await supabase
+    .from("bookmarked_companion")
+    .insert({ companion_id: companionId, user_id: userId })
+
+  if (error) {
+    // 23505 = PostgreSQL unique violation
+    if (error.code === "23505") {
+      console.log("This companion is already bookmarked")
+      return data
+    }
+    throw new Error(error.message)
+  }
+
+  // Revalidate the path to update UI
+  revalidatePath(path)
+  return data
 }
+
 
 export const removeBookmark = async (companionId: string, path: string) => {
 	const { userId } = await auth()
 	if (!userId) return
 	const supabase = createSupabaseClient()
 	const { data, error } = await supabase
-		.from("bookmarks")
+		.from("bookmarked_companion")
 		.delete()
 		.eq("companion_id", companionId)
 		.eq("user_id", userId)
@@ -181,7 +194,7 @@ export const removeBookmark = async (companionId: string, path: string) => {
 export const getBookmarkedCompanions = async (userId: string) => {
 	const supabase = createSupabaseClient()
 	const { data, error } = await supabase
-		.from("bookmarks")
+		.from("bookmarked_companion")
 		.select(`companions:companion_id (*)`) // Notice the (*) to get all the companion data
 		.eq("user_id", userId)
 	if (error) {

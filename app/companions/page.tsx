@@ -1,15 +1,25 @@
+import { attachBookmarkStatusToCompanions } from "@/lib/actions/companion.bookmark"
+import { currentUser } from "@clerk/nextjs/server"
 import { getAllCompanions } from "@/lib/actions/companion.actions"
 import CompanionCard from "@/components/CompanionCard"
 import { getSubjectColor } from "@/lib/utils"
 import SearchInput from "@/components/SearchInput"
 import SubjectFilter from "@/components/SubjectFilter"
 
-const CompanionsLibrary = async ({ searchParams }: SearchParams) => {
-	const filters = await searchParams
-	const subject = filters.subject ? filters.subject : ""
-	const topic = filters.topic ? filters.topic : ""
+const CompanionsLibraryPage = async ({ searchParams }: SearchParams) => {
+	const appliedFilters = (await searchParams) ?? {}
+	const selectedSubject = appliedFilters.subject ?? ""
+	const searchTopic = appliedFilters.topic ?? ""
 
-	const companions = await getAllCompanions({ subject, topic })
+	const authenticatedUser = await currentUser()
+	const companionsList = await getAllCompanions({
+		subject: selectedSubject,
+		topic: searchTopic,
+	})
+	const companionsWithBookmarkStatus = await attachBookmarkStatusToCompanions(
+		companionsList,
+		authenticatedUser?.id ?? null
+	)
 
 	return (
 		<main>
@@ -20,8 +30,9 @@ const CompanionsLibrary = async ({ searchParams }: SearchParams) => {
 					<SubjectFilter />
 				</div>
 			</section>
+
 			<section className="companions-grid">
-				{companions.map((companion) => (
+				{companionsWithBookmarkStatus.map((companion) => (
 					<CompanionCard
 						key={companion.id}
 						{...companion}
@@ -33,4 +44,4 @@ const CompanionsLibrary = async ({ searchParams }: SearchParams) => {
 	)
 }
 
-export default CompanionsLibrary
+export default CompanionsLibraryPage

@@ -1,24 +1,30 @@
-import CompanionCard from "@/components/CompanionCard"
-import CompanionsList from "@/components/CompanionsList"
-import CTA from "@/components/CTA"
-import { recentSessions } from "@/constants"
+import { attachBookmarkStatusToCompanions } from "@/lib/actions/companion.bookmark"
+import { currentUser } from "@clerk/nextjs/server"
 import {
 	getAllCompanions,
 	getRecentSessions,
 } from "@/lib/actions/companion.actions"
+import CompanionCard from "@/components/CompanionCard"
+import CompanionsList from "@/components/CompanionsList"
+import CTA from "@/components/CTA"
 import { getSubjectColor } from "@/lib/utils"
 
-const Page = async () => {
-	const companions = await getAllCompanions({ limit: 3 })
-	const recentSessionsCompanions =
-		(await getRecentSessions(10)) || recentSessions
+const HomePage = async () => {
+	const authenticatedUser = await currentUser()
+	const popularCompanions = await getAllCompanions({ limit: 3 })
+	const popularCompanionsWithBookmarks = await attachBookmarkStatusToCompanions(
+		popularCompanions,
+		authenticatedUser?.id ?? null
+	)
+
+	const recentlyCompletedSessions = (await getRecentSessions(10)) || []
 
 	return (
 		<main>
 			<h1>Popular Companions</h1>
 
 			<section className="home-section">
-				{companions.map((companion) => (
+				{popularCompanionsWithBookmarks.map((companion) => (
 					<CompanionCard
 						key={companion.id}
 						{...companion}
@@ -29,8 +35,8 @@ const Page = async () => {
 
 			<section className="home-section">
 				<CompanionsList
-					title="Recently completed sessions"
-					companions={recentSessionsCompanions}
+					title="Recently Completed Sessions"
+					companions={recentlyCompletedSessions}
 					classNames="w-2/3 max-lg:w-full"
 				/>
 				<CTA />
@@ -39,4 +45,4 @@ const Page = async () => {
 	)
 }
 
-export default Page
+export default HomePage
