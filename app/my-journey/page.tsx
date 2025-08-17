@@ -32,6 +32,7 @@ const Profile = async () => {
 						alt={user.firstName!}
 						width={110}
 						height={110}
+						className="rounded-lg border"
 					/>
 					<div className="flex flex-col gap-2">
 						<h1 className="font-bold text-2xl">
@@ -43,7 +44,7 @@ const Profile = async () => {
 					</div>
 				</div>
 				<div className="flex gap-4">
-					<div className="border border-black rouded-lg p-3 gap-2 flex flex-col h-fit">
+					<div className="border border-black rounded-lg p-3 gap-2 flex flex-col h-fit">
 						<div className="flex gap-2 items-center">
 							<Image
 								src="/icons/check.svg"
@@ -55,7 +56,7 @@ const Profile = async () => {
 						</div>
 						<div>Lessons completed</div>
 					</div>
-					<div className="border border-black rouded-lg p-3 gap-2 flex flex-col h-fit">
+					<div className="border border-black rounded-lg p-3 gap-2 flex flex-col h-fit">
 						<div className="flex gap-2 items-center">
 							<Image src="/icons/cap.svg" alt="cap" width={22} height={22} />
 							<p className="text-2xl font-bold">{companions.length}</p>
