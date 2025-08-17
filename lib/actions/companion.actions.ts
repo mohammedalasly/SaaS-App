@@ -6,15 +6,24 @@ import { revalidatePath } from "next/cache"
 
 export const createCompanion = async (formData: CreateCompanion) => {
 	const { userId: author } = await auth()
-	const supabase = createSupabaseClient()
+	if (!author) throw new Error("Unauthorized")
 
+	const canCreate = await newCompanionPermissions()
+	if (!canCreate) {
+		throw new Error(
+			"You’ve reached your companion limit for your plan. Upgrade to create more."
+		)
+	}
+
+	const supabase = createSupabaseClient()
 	const { data, error } = await supabase
 		.from("companions")
 		.insert({ ...formData, author })
 		.select()
 
-	if (error || !data)
+	if (error || !data) {
 		throw new Error(error?.message || "Failed to create a companion")
+	}
 
 	return data[0]
 }
@@ -51,7 +60,6 @@ export const getAllCompanions = async ({
 
 	return companions
 }
-
 
 export const getCompanion = async (id: string) => {
 	const supabase = createSupabaseClient()
@@ -125,54 +133,49 @@ export const newCompanionPermissions = async () => {
 	let limit = 0
 
 	if (has({ plan: "pro" })) {
-		return true
-	} else if (has({ feature: "3_companion_limit" })) {
-		limit = 3
-	} else if (has({ feature: "10_companion_limit" })) {
 		limit = 10
+	} else if (has({ plan: "free" })) {
+		limit = 3
+	} else {
+		// fallback for future/enterprise plans
+		limit = 3
 	}
 
-	const { data, error } = await supabase
+	const { count, error } = await supabase
 		.from("companions")
-		.select("id", { count: "exact" })
+		.select("*", { count: "exact", head: true })
 		.eq("author", userId)
 
 	if (error) throw new Error(error.message)
 
-	const companionCount = data?.length
-
-	if (companionCount >= limit) {
-		return false
-	} else {
-		return true
-	}
+	return (count ?? 0) < limit
 }
+
 
 // Bookmarks
 export const addBookmark = async (companionId: string, path: string) => {
-  const { userId } = await auth()
-  if (!userId) return
+	const { userId } = await auth()
+	if (!userId) return
 
-  const supabase = createSupabaseClient()
+	const supabase = createSupabaseClient()
 
-  const { data, error } = await supabase
-    .from("bookmarked_companion")
-    .insert({ companion_id: companionId, user_id: userId })
+	const { data, error } = await supabase
+		.from("bookmarked_companion")
+		.insert({ companion_id: companionId, user_id: userId })
 
-  if (error) {
-    // 23505 = PostgreSQL unique violation
-    if (error.code === "23505") {
-      console.log("This companion is already bookmarked")
-      return data
-    }
-    throw new Error(error.message)
-  }
+	if (error) {
+		// 23505 = PostgreSQL unique violation
+		if (error.code === "23505") {
+			console.log("This companion is already bookmarked")
+			return data
+		}
+		throw new Error(error.message)
+	}
 
-  // Revalidate the path to update UI
-  revalidatePath(path)
-  return data
+	// Revalidate the path to update UI
+	revalidatePath(path)
+	return data
 }
-
 
 export const removeBookmark = async (companionId: string, path: string) => {
 	const { userId } = await auth()
