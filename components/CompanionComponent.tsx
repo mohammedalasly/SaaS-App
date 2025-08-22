@@ -7,6 +7,7 @@ import Image from "next/image"
 import Lottie, { LottieRefCurrentProps } from "lottie-react"
 import soundwaves from "@/constants/soundwaves.json"
 import { addToSessionHistory } from "@/lib/actions/companion.actions"
+import { BsMicFill, BsMicMuteFill } from "react-icons/bs"
 
 enum CallStatus {
 	INACTIVE = "INACTIVE",
@@ -104,8 +105,8 @@ const CompanionComponent = ({
 	}
 
 	return (
-		<section className="flex flex-col h-[70vh]">
-			<section className="flex gap-8 max-sm:flex-col">
+		<section className="flex flex-col h-screen">
+			<section className="flex gap-8 max-sm:flex-col pb-8">
 				<div className="companion-section">
 					<div
 						className="companion-avatar"
@@ -127,7 +128,7 @@ const CompanionComponent = ({
 								alt={subject}
 								width={150}
 								height={150}
-								className="max-sm:w-fit"
+								className="max-sm:w-20"
 							/>
 						</div>
 
@@ -164,12 +165,8 @@ const CompanionComponent = ({
 						onClick={toggleMicrophone}
 						disabled={callStatus !== CallStatus.ACTIVE}
 					>
-						<Image
-							src={isMuted ? "/icons/mic-off.svg" : "/icons/mic-on.svg"}
-							alt="mic"
-							width={36}
-							height={36}
-						/>
+						{isMuted ? <BsMicMuteFill size={28} /> : <BsMicFill size={28} />}
+
 						<p className="max-sm:hidden">
 							{isMuted ? "Turn on microphone" : "Turn off microphone"}
 						</p>
@@ -193,27 +190,65 @@ const CompanionComponent = ({
 				</div>
 			</section>
 
-			<section className="transcript">
-				<div className="transcript-message no-scrollbar">
-					{messages.map((message, index) => {
-						if (message.role === "assistant") {
-							return (
-								<p key={index} className="max-sm:text-sm">
-									{name.split(" ")[0].replace("/[.,]/g, ", "")}:{" "}
-									{message.content}
-								</p>
-							)
-						} else {
-							return (
-								<p key={index} className="text-primary max-sm:text-sm">
-									{userName}: {message.content}
-								</p>
-							)
-						}
-					})}
+			{/* TRANSCRIPT */}
+			<section className="transcript relative w-full h-full flex flex-col overflow-hidden">
+				<div className="transcript-message no-scrollbar flex flex-col gap-5 overflow-y-auto">
+					{messages.map((message, index) =>
+						message.role === "assistant" ? (
+							<div
+								key={index}
+								className="flex items-start gap-2 w-auto self-start"
+							>
+								{/* Assistant Avatar */}
+								<div className=" flex items-center justify-center">
+									<Image
+										src="/images/chatbot.png"
+										alt="chatbot"
+										width={50}
+										height={50}
+										className="rounded-full"
+									/>
+								</div>
+								{/* <div className="font-medium">
+									{name.split(" ")[0].replace(/[.,]/g, ",")}
+								</div> */}
+
+								{/* Assistant Bubble */}
+								<div
+									className="rounded-md px-4 py-2 text-gray-900"
+									style={{ backgroundColor: getSubjectColor(subject) }}
+								>
+									<span className="text-[1.1rem]">{message.content}</span>
+								</div>
+							</div>
+						) : (
+							<div
+								key={index}
+								className="flex items-start gap-2 w-auto self-end"
+							>
+								{/* User Bubble */}
+								<div className="rounded-md bg-[#EBE5C2] px-4 py-2 text-gray-900">
+									<span className="text-[1.1rem]">{message.content}</span>
+								</div>
+
+								{/* User Avatar */}
+								<div className=" rounded-full flex items-center justify-centerorder-2">
+									<Image
+										src={userImage}
+										alt={userName}
+										width={50}
+										height={50}
+										className="rounded-full"
+									/>
+								</div>
+							</div>
+						)
+					)}
 				</div>
 
-				<div className="transcript-fade" />
+				{/* bottom fade */}
+				{/* <div className="transcript-fade absolute bottom-0 left-0 right-0 h-5 
+				bg-gradient-to-t from-white to-transparent pointer-events-none" /> */}
 			</section>
 		</section>
 	)

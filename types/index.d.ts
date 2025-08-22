@@ -1,20 +1,14 @@
-// type User = {
-//   name: string;
-//   email: string;
-//   image?: string;
-//   accountId: string;
-// };
-
 enum Subject {
-  maths = "maths",
-  language = "language",
-  science = "science",
-  history = "history",
-  coding = "coding",
-  geography = "geography",
-  economics = "economics",
-  finance = "finance",
-  business = "business",
+	frontend_development = "frontend development",
+  backend_development = "backend development",
+  graphic_design = "graphic design",
+  devops = "devops & cloud engineering",
+  machine_learning = "machine learning",
+  data_science = "data science",
+  data_engineering = "data engineering",
+  artificial_intelligence = "artificial intelligence",
+  deep_learning = "Deep Learning",
+  cybersecurity = "cybersecurity",
 }
 
 type Companion = Models.DocumentList<Models.Document> & {

@@ -9,6 +9,8 @@ import {
 import { cn, getSubjectColor } from "@/lib/utils"
 import Link from "next/link"
 import Image from "next/image"
+import { BsClock } from "react-icons/bs"
+
 
 interface CompanionsListProps {
 	title: string
@@ -23,42 +25,42 @@ const CompanionsList = ({
 }: CompanionsListProps) => {
 	return (
 		<article className={cn("companion-list", classNames)}>
-			<h2 className="font-bold text-3xl">{title}</h2>
+			<h2 className="font-bold text-2xl pb-5">{title}</h2>
 
 			<Table>
 				<TableHeader>
 					<TableRow>
-						<TableHead className="text-lg w-2/3">Lessons</TableHead>
+						<TableHead className="text-lg w-2/4">Lessons</TableHead>
 						<TableHead className="text-lg">Subject</TableHead>
 						<TableHead className="text-lg text-right">Duration</TableHead>
 					</TableRow>
 				</TableHeader>
 				<TableBody>
-					{companions?.map(({ id, subject, name, topic, duration }) => (
-						<TableRow key={id}>
+					{companions?.map(({ id, subject, name, topic, duration }, index) => (
+						<TableRow key={`${id}-${index}`}>
 							<TableCell>
 								<Link href={`/companions/${id}`}>
 									<div className="flex items-center gap-2">
 										<div
-											className="size-[72px] flex items-center justify-center rounded-lg max-md:hidden"
+											className="size-[80px] flex items-center justify-center rounded-lg max-md:hidden"
 											style={{ backgroundColor: getSubjectColor(subject) }}
 										>
 											<Image
 												src={`/icons/${subject}.svg`}
 												alt={subject}
-												width={35}
-												height={35}
+												width={60}
+												height={60}
 											/>
 										</div>
 										<div className="flex flex-col gap-2">
-											<p className="font-bold text-2xl">{name}</p>
-											<p className="text-lg">{topic}</p>
+											<p className="font-bold md:text-xl text-lg">{name}</p>
+											<p className="text-sm md:text-lg">{topic}</p>
 										</div>
 									</div>
 								</Link>
 							</TableCell>
 							<TableCell>
-								<div className="subject-badge w-fit max-md:hidden">
+								<div className="subject-badge w-fit max-md:hidden text-[12]">
 									{subject}
 								</div>
 								<div
@@ -74,17 +76,11 @@ const CompanionsList = ({
 								</div>
 							</TableCell>
 							<TableCell>
-								<div className="flex items-center gap-2 w-full justify-end">
-									<p className="text-2xl">
+								<div className="flex items-center gap-1 w-full justify-end">
+									<p className="text-base">
 										{duration} <span className="max-md:hidden">mins</span>
 									</p>
-									<Image
-										src="/icons/clock.svg"
-										alt="minutes"
-										width={14}
-										height={14}
-										className="md:hidden"
-									/>
+									<BsClock className="text-sm" />
 								</div>
 							</TableCell>
 						</TableRow>

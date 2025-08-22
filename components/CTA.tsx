@@ -1,9 +1,11 @@
 import Image from "next/image"
 import Link from "next/link"
+import { BsPlus } from "react-icons/bs"
+
 
 const Cta = () => {
 	return (
-		<section className="cta-section">
+		<section className="cta-section shadow-lg shadow-gray-300">
 			<div className="cta-badge">Start learning your way.</div>
 			<h2 className="text-3xl font-bold">
 				Build and Personalize Learning Companion
@@ -12,9 +14,9 @@ const Cta = () => {
 				Pick a name, subject, voice, & personality — and start learning through
 				voice conversations that feel natural and fun.
 			</p>
-			<Image src="images/cta.svg" alt="cta" width={362} height={232} />
+			<Image src="/images/cta.png" alt="cta" width={362} height={232} className="rounded-lg" />
 			<button className="btn-primary">
-				<Image src="/icons/plus.svg" alt="plus" width={12} height={12} />
+				<BsPlus size={26} />
 				<Link href="/companions/new">
 					<p>Build a New Companion</p>
 				</Link>
