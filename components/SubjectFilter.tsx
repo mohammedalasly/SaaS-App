@@ -10,6 +10,7 @@ import {
 import { subjects } from "@/constants"
 import { useRouter } from "next/navigation"
 import { useSearchParams } from "next/navigation"
+
 // Utility functions to handle URL query manipulation
 function formUrlQuery({
 	params,
@@ -40,13 +41,24 @@ function removeKeysFromUrlQuery({
 const SubjectFilter = () => {
 	const router = useRouter()
 	const searchParams = useSearchParams()
-	const query = searchParams.get("subject") || ""
+	const currentSubject = searchParams.get("subject") || "all"
 
-	const [subject, setSubject] = useState(query)
+	const [subject, setSubject] = useState(currentSubject)
 
+	// Sync state with URL params only when URL changes
 	useEffect(() => {
+		setSubject(currentSubject)
+	}, [currentSubject])
+
+	// Handle subject change - only navigate when value actually changes
+	const handleSubjectChange = (newSubject: string) => {
+		// Prevent navigation if the value hasn't changed
+		if (newSubject === currentSubject) return
+
+		setSubject(newSubject)
+
 		let newUrl = ""
-		if (subject === "all") {
+		if (newSubject === "all") {
 			newUrl = removeKeysFromUrlQuery({
 				params: searchParams.toString(),
 				keysToRemove: ["subject"],
@@ -55,14 +67,14 @@ const SubjectFilter = () => {
 			newUrl = formUrlQuery({
 				params: searchParams.toString(),
 				key: "subject",
-				value: subject,
+				value: newSubject,
 			})
 		}
 		router.push(newUrl, { scroll: false })
-	}, [subject, router, searchParams])
+	}
 
 	return (
-		<Select onValueChange={setSubject} value={subject}>
+		<Select onValueChange={handleSubjectChange} value={subject}>
 			<SelectTrigger className="input capitalize border-2">
 				<SelectValue placeholder="Subject" />
 			</SelectTrigger>
