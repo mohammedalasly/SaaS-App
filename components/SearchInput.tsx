@@ -39,7 +39,7 @@ const SearchInput = () => {
 
 	return (
 		<div className="relative border-2 border-black rounded-lg items-center 
-		flex gap-2 px-2 py-1 ">
+		flex gap-2 px-2 py-1">
 			<BsSearch size={20} />
 			<input
 				placeholder="Search companions..."

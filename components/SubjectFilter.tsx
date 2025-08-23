@@ -69,7 +69,7 @@ const SubjectFilter = () => {
 			<SelectContent>
 				<SelectItem value="all">All subjects</SelectItem>
 				{subjects.map((subject) => (
-					<SelectItem key={subject} value={subject} className="capitalize">
+					<SelectItem key={subject} value={subject}>
 						{subject}
 					</SelectItem>
 				))}
