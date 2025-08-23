@@ -107,7 +107,12 @@ const CompanionComponent = ({
 	return (
 		<section className="flex flex-col h-screen">
 			<section className="flex gap-8 max-sm:flex-col pb-8">
-				<div className="companion-section">
+				<div
+					className="companion-section"
+					style={{
+						borderColor: getSubjectColor(subject),
+					}}
+				>
 					<div
 						className="companion-avatar"
 						style={{ backgroundColor: getSubjectColor(subject) }}
@@ -197,25 +202,22 @@ const CompanionComponent = ({
 						message.role === "assistant" ? (
 							<div
 								key={index}
-								className="flex items-start gap-2 w-auto self-start"
+								className=" flex items-center justify-center gap-2 w-auto self-start"
 							>
 								{/* Assistant Avatar */}
-								<div className=" flex items-center justify-center">
+								<div className="">
 									<Image
 										src="/images/chatbot.png"
 										alt="chatbot"
-										width={50}
-										height={50}
+										width={35}
+										height={35}
 										className="rounded-full"
 									/>
 								</div>
-								{/* <div className="font-medium">
-									{name.split(" ")[0].replace(/[.,]/g, ",")}
-								</div> */}
 
 								{/* Assistant Bubble */}
 								<div
-									className="rounded-md px-4 py-2 text-gray-900"
+									className="rounded-md px-3 py-1 text-gray-900"
 									style={{ backgroundColor: getSubjectColor(subject) }}
 								>
 									<span className="text-[1.1rem]">{message.content}</span>
@@ -227,17 +229,20 @@ const CompanionComponent = ({
 								className="flex items-start gap-2 w-auto self-end"
 							>
 								{/* User Bubble */}
-								<div className="rounded-md bg-[#EBE5C2] px-4 py-2 text-gray-900">
+								<div
+									className="rounded-md bg-[#EBE5C2] px-3 py-2 
+								text-gray-900 flex items-center justify-center"
+								>
 									<span className="text-[1.1rem]">{message.content}</span>
 								</div>
 
 								{/* User Avatar */}
-								<div className=" rounded-full flex items-center justify-centerorder-2">
+								<div className=" rounded-full order-2">
 									<Image
 										src={userImage}
 										alt={userName}
-										width={50}
-										height={50}
+										width={35}
+										height={35}
 										className="rounded-full"
 									/>
 								</div>
