@@ -17,7 +17,7 @@ Trenavo: Real-time AI Teaching Platform
 </div>
 
 <div align="center">
-<img src="./public/readme/vapi.png" alt="Vapi" width="120"/>
+<img src="./public/readme/vapi.png" alt="Vapi" width="100"/>
 </div>
 <br />
 <br />
