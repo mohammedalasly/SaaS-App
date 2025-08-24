@@ -32,6 +32,12 @@ const CompanionComponent = ({
 	const [messages, setMessages] = useState<SavedMessage[]>([])
 
 	const lottieRef = useRef<LottieRefCurrentProps>(null)
+	const messagesEndRef = useRef<HTMLDivElement>(null)
+
+	// auto scroll to bottom on new message
+	useEffect(() => {
+		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+	}, [messages])
 
 	useEffect(() => {
 		if (lottieRef) {
@@ -54,7 +60,8 @@ const CompanionComponent = ({
 		const onMessage = (message: Message) => {
 			if (message.type === "transcript" && message.transcriptType === "final") {
 				const newMessage = { role: message.role, content: message.transcript }
-				setMessages((prev) => [newMessage, ...prev])
+				// append message instead of prepend
+				setMessages((prev) => [...prev, newMessage])
 			}
 		}
 
@@ -196,31 +203,31 @@ const CompanionComponent = ({
 			</section>
 
 			{/* TRANSCRIPT */}
-			<section className="transcript relative w-full h-full flex flex-col overflow-hidden">
-				<div className="transcript-message no-scrollbar flex flex-col gap-5 overflow-y-auto">
+			<section className="transcript relative w-full h-full flex flex-col overflow-hidden border-1 border-gray-100 rounded-lg">
+				<div className="transcript-message no-scrollbar flex flex-col gap-3 overflow-y-auto">
 					{messages.map((message, index) =>
 						message.role === "assistant" ? (
 							<div
 								key={index}
-								className=" flex items-center justify-center gap-2 w-auto self-start"
+								className="flex items-center justify-center gap-1.5 w-auto self-start"
 							>
 								{/* Assistant Avatar */}
-								<div className="">
+								<div className="w-8 h-8 flex-shrink-0">
 									<Image
 										src="/images/chatbot.png"
 										alt="chatbot"
-										width={35}
-										height={35}
-										className="rounded-full"
+										width={32}
+										height={32}
+										className="rounded-full w-8 h-8 object-cover"
 									/>
 								</div>
 
 								{/* Assistant Bubble */}
 								<div
-									className="rounded-md px-3 py-1 text-gray-900"
+									className="rounded-md px-3 py-1.5 text-gray-900"
 									style={{ backgroundColor: getSubjectColor(subject) }}
 								>
-									<span className="text-[1.1rem]">{message.content}</span>
+									<span className="text-[1rem]">{message.content}</span>
 								</div>
 							</div>
 						) : (
@@ -229,31 +236,26 @@ const CompanionComponent = ({
 								className="flex items-start gap-2 w-auto self-end"
 							>
 								{/* User Bubble */}
-								<div
-									className="rounded-md bg-[#EBE5C2] px-3 py-2 
-								text-gray-900 flex items-center justify-center"
-								>
-									<span className="text-[1.1rem]">{message.content}</span>
+								<div className="rounded-md bg-[#EBE5C2] px-3 py-1.5 text-gray-900 flex items-center justify-center">
+									<span className="text-[1rem]">{message.content}</span>
 								</div>
 
 								{/* User Avatar */}
-								<div className=" rounded-full order-2">
+								<div className="rounded-full order-2 w-8 h-8 flex-shrink-0">
 									<Image
 										src={userImage}
 										alt={userName}
-										width={35}
-										height={35}
+										width={32}
+										height={32}
 										className="rounded-full"
 									/>
 								</div>
 							</div>
 						)
 					)}
+					{/* auto-scroll target */}
+					<div ref={messagesEndRef} />
 				</div>
-
-				{/* bottom fade */}
-				{/* <div className="transcript-fade absolute bottom-0 left-0 right-0 h-5 
-				bg-gradient-to-t from-white to-transparent pointer-events-none" /> */}
 			</section>
 		</section>
 	)
